@@ -4,16 +4,25 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from app.api.deps import SessionDep
-from app.core.security import get_password_hash
 from app.models import (
-    User,
+    UserCreate,
     UserPublic,
 )
+from app.services import user as user_service
 
 router = APIRouter(tags=["private"], prefix="/private")
 
 
 class PrivateUserCreate(BaseModel):
+    """Schema for creating users via private API.
+
+    Attributes:
+        email: User's email address.
+        password: User's password.
+        full_name: User's full name.
+        is_verified: Whether the user is verified (unused currently).
+    """
+
     email: str
     password: str
     full_name: str
@@ -22,17 +31,22 @@ class PrivateUserCreate(BaseModel):
 
 @router.post("/users/", response_model=UserPublic)
 def create_user(user_in: PrivateUserCreate, session: SessionDep) -> Any:
-    """
-    Create a new user.
-    """
+    """Create a new user via private API.
 
-    user = User(
+    This endpoint is intended for internal service-to-service calls
+    and does not require authentication.
+
+    Args:
+        user_in: The user data to create.
+        session: Database session dependency.
+
+    Returns:
+        The newly created user.
+    """
+    user_create = UserCreate(
         email=user_in.email,
+        password=user_in.password,
         full_name=user_in.full_name,
-        hashed_password=get_password_hash(user_in.password),
     )
-
-    session.add(user)
-    session.commit()
-
+    user = user_service.create_user(session=session, user_create=user_create)
     return user
