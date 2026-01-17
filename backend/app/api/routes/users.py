@@ -1,22 +1,30 @@
 import uuid
-from typing import Any
+from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi_refine import (
+    FilterConfig,
+    FilterField,
+    RefineQuery,
+    RefineResponse,
+    SortConfig,
+)
 
-from app.api.deps import (
+from app.api.deps.common import (
     CurrentUser,
     SessionDep,
     get_current_active_superuser,
 )
+from app.api.deps.refine import refine_query_dep
 from app.core.config import settings
 from app.core.security import verify_password
 from app.models import (
     Message,
     UpdatePassword,
+    User,
     UserCreate,
     UserPublic,
     UserRegister,
-    UsersPublic,
     UserUpdate,
     UserUpdateMe,
 )
@@ -24,30 +32,74 @@ from app.services import user as user_service
 from app.utils import generate_new_account_email, send_email
 
 router = APIRouter(prefix="/users", tags=["users"])
+owners_router = APIRouter(prefix="/owners", tags=["users"])
+
+# Get table columns for Refine config (SQLModel provides __table__ at runtime)
+_user_c = User.__table__.c  # type: ignore[attr-defined]
+
+# Configure Refine query parameters for users
+user_filter_config = FilterConfig(
+    fields={
+        "id": FilterField(column=_user_c.id, cast=uuid.UUID),
+        "email": FilterField(column=_user_c.email, cast=str),
+        "full_name": FilterField(column=_user_c.full_name, cast=str),
+        "is_active": FilterField(column=_user_c.is_active, cast=bool),
+        "is_superuser": FilterField(column=_user_c.is_superuser, cast=bool),
+    },
+    search_fields=[_user_c.email, _user_c.full_name],
+)
+
+user_sort_config = SortConfig(
+    fields={
+        "email": _user_c.email,
+        "full_name": _user_c.full_name,
+        "id": _user_c.id,
+    }
+)
+
+UserQuery = Annotated[
+    RefineQuery,
+    refine_query_dep(User, user_filter_config, user_sort_config),
+]
 
 
 @router.get(
     "/",
     dependencies=[Depends(get_current_active_superuser)],
-    response_model=UsersPublic,
+    response_model=list[UserPublic],
 )
-def read_users(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+@owners_router.get(
+    "/",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=list[UserPublic],
+)
+def read_users(
+    response: Response,
+    session: SessionDep,
+    query: UserQuery,
+) -> Any:
     """Retrieve a paginated list of all users.
 
     Requires superuser privileges.
+    Supports Refine's simple-rest pagination, sorting, and filtering.
 
     Args:
+        response: FastAPI response object for setting headers.
         session: Database session dependency.
-        skip: Number of records to skip for pagination.
-        limit: Maximum number of records to return.
+        query: Refine query parameters (pagination, sort, filter).
 
     Returns:
-        Paginated list of users with total count.
+        List of users with x-total-count header.
     """
     users, count = user_service.get_users_paginated(
-        session=session, skip=skip, limit=limit
+        session=session,
+        skip=query.offset,
+        limit=query.limit,
+        conditions=query.conditions,
+        order_by=query.order_by,
     )
-    return UsersPublic(data=users, count=count)
+    RefineResponse(response).set_total_count(count)
+    return users
 
 
 @router.post(
@@ -217,6 +269,7 @@ def register_user(session: SessionDep, user_in: UserRegister) -> Any:
 
 
 @router.get("/{user_id}", response_model=UserPublic)
+@owners_router.get("/{user_id}", response_model=UserPublic)
 def read_user_by_id(
     user_id: uuid.UUID, session: SessionDep, current_user: CurrentUser
 ) -> Any:

@@ -1,6 +1,7 @@
 import uuid
 from typing import Any
 
+from sqlalchemy import ColumnElement
 from sqlmodel import Session, col, delete, func, select
 
 from app.core.security import get_password_hash, verify_password
@@ -85,7 +86,12 @@ def authenticate(*, session: Session, email: str, password: str) -> User | None:
 
 
 def get_users_paginated(
-    *, session: Session, skip: int = 0, limit: int = 100
+    *,
+    session: Session,
+    skip: int = 0,
+    limit: int = 100,
+    conditions: list[ColumnElement[Any]] | None = None,
+    order_by: list[Any] | None = None,
 ) -> tuple[list[User], int]:
     """Retrieve a paginated list of users with total count.
 
@@ -93,14 +99,25 @@ def get_users_paginated(
         session: Database session for the operation.
         skip: Number of records to skip for pagination.
         limit: Maximum number of records to return.
+        conditions: Optional SQLAlchemy filter conditions from Refine query.
+        order_by: Optional SQLAlchemy order_by clauses from Refine query.
 
     Returns:
         A tuple of (list of users, total count of all users).
     """
+    # Count query
     count_statement = select(func.count()).select_from(User)
+    if conditions:
+        count_statement = count_statement.where(*conditions)
     count = session.exec(count_statement).one()
 
-    statement = select(User).offset(skip).limit(limit)
+    # Data query
+    statement = select(User)
+    if conditions:
+        statement = statement.where(*conditions)
+    if order_by:
+        statement = statement.order_by(*order_by)
+    statement = statement.offset(skip).limit(limit)
     users = list(session.exec(statement).all())
 
     return users, count

@@ -1,5 +1,7 @@
 import uuid
+from typing import Any
 
+from sqlalchemy import ColumnElement
 from sqlmodel import Session, func, select
 
 from app.models import Item, ItemCreate, ItemUpdate
@@ -24,7 +26,13 @@ def create_item(*, session: Session, item_in: ItemCreate, owner_id: uuid.UUID) -
 
 
 def get_items_paginated(
-    *, session: Session, owner_id: uuid.UUID | None, skip: int = 0, limit: int = 100
+    *,
+    session: Session,
+    owner_id: uuid.UUID | None,
+    skip: int = 0,
+    limit: int = 100,
+    conditions: list[ColumnElement[Any]] | None = None,
+    order_by: list[Any] | None = None,
 ) -> tuple[list[Item], int]:
     """Retrieve a paginated list of items with total count.
 
@@ -33,26 +41,33 @@ def get_items_paginated(
         owner_id: Filter by owner; if None, returns all items (for superusers).
         skip: Number of records to skip for pagination.
         limit: Maximum number of records to return.
+        conditions: Optional SQLAlchemy filter conditions from Refine query.
+        order_by: Optional SQLAlchemy order_by clauses from Refine query.
 
     Returns:
         A tuple of (list of items, total count matching the filter).
     """
-    if owner_id is None:
-        # Superuser: get all items
-        count_statement = select(func.count()).select_from(Item)
-        count = session.exec(count_statement).one()
-        statement = select(Item).offset(skip).limit(limit)
-        items = list(session.exec(statement).all())
-    else:
-        # Regular user: get only their items
-        count_statement = (
-            select(func.count()).select_from(Item).where(Item.owner_id == owner_id)
-        )
-        count = session.exec(count_statement).one()
-        statement = (
-            select(Item).where(Item.owner_id == owner_id).offset(skip).limit(limit)
-        )
-        items = list(session.exec(statement).all())
+    # Build base query conditions
+    base_conditions: list[ColumnElement[Any]] = []
+    if owner_id is not None:
+        base_conditions.append(Item.owner_id == owner_id)
+    if conditions:
+        base_conditions.extend(conditions)
+
+    # Count query
+    count_statement = select(func.count()).select_from(Item)
+    if base_conditions:
+        count_statement = count_statement.where(*base_conditions)
+    count = session.exec(count_statement).one()
+
+    # Data query
+    statement = select(Item)
+    if base_conditions:
+        statement = statement.where(*base_conditions)
+    if order_by:
+        statement = statement.order_by(*order_by)
+    statement = statement.offset(skip).limit(limit)
+    items = list(session.exec(statement).all())
 
     return items, count
 

@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from app.api.deps import SessionDep
+from app.api.deps.common import SessionDep
 from app.models import (
     UserCreate,
     UserPublic,

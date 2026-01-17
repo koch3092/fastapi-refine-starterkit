@@ -162,9 +162,11 @@ def test_retrieve_users(
     r = client.get(f"{settings.API_V1_STR}/users/", headers=superuser_token_headers)
     all_users = r.json()
 
-    assert len(all_users["data"]) > 1
-    assert "count" in all_users
-    for item in all_users["data"]:
+    # Refine-compatible response: list with x-total-count header
+    assert len(all_users) > 1
+    assert "x-total-count" in r.headers
+    assert int(r.headers["x-total-count"]) > 1
+    for item in all_users:
         assert "email" in item
 
 
