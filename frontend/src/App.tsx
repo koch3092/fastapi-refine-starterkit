@@ -26,8 +26,11 @@ import { Register } from "@/pages/register";
 import { authProvider } from "@/providers/auth";
 import { dataProvider } from "@/providers/data";
 import { ItemCreate, ItemEdit, ItemList, ItemShow } from "@/pages/items";
+import { UserCreate, UserEdit, UserList, UserShow } from "@/pages/users";
 
 function App() {
+  const isAdmin = true;
+
   return (
     <BrowserRouter>
       <RefineKbarProvider>
@@ -48,6 +51,17 @@ function App() {
                     show: "/items/show/:id",
                     meta: {
                       canDelete: true,
+                    },
+                  },
+                  {
+                    name: "users",
+                    list: "/users",
+                    create: "/users/create",
+                    edit: "/users/edit/:id",
+                    show: "/users/show/:id",
+                    meta: {
+                      canDelete: true,
+                      hide: !isAdmin,
                     },
                   },
                 ]}
@@ -83,6 +97,14 @@ function App() {
                       <Route path="edit/:id" element={<ItemEdit />} />
                       <Route path="show/:id" element={<ItemShow />} />
                     </Route>
+                    {isAdmin && (
+                      <Route path="/users">
+                        <Route index element={<UserList />} />
+                        <Route path="create" element={<UserCreate />} />
+                        <Route path="edit/:id" element={<UserEdit />} />
+                        <Route path="show/:id" element={<UserShow />} />
+                      </Route>
+                    )}
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
                   <Route
