@@ -4,7 +4,7 @@ Loaded automatically by AGENTS.md-aware agents at session start. Read before act
 
 ## TL;DR
 
-- Stack: FastAPI + SQLModel + PostgreSQL backend; Vite + React 19 + Refine + Ant Design frontend; npm and `uv`.
+- Stack: FastAPI + SQLModel + PostgreSQL backend; Vite + React 19 + Refine + shadcn/ui + Tailwind CSS frontend; npm and `uv`.
 - This repository is a business-agnostic starter kit. Keep auth, users, items, assets, Refine data access, migrations, tests, and docs reusable.
 - Backend list APIs follow `@refinedev/simple-rest`; use `fastapi-refine` helpers instead of one-off query parsing.
 - S3-compatible object storage is enabled by default through the `assets` resource. Local Docker uses MinIO.

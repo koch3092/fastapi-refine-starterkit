@@ -15,7 +15,7 @@ Docker Compose, and focused tests. Add project-specific domain models and pages 
 - **Assets**: default S3/MinIO-backed file resource with presigned browser uploads
 - **Refine integration**: list pagination/sorting/filtering through `fastapi-refine`
 - **Unified errors**: runtime and OpenAPI error envelopes from `fastapi-refine`
-- **Frontend**: React 19, TypeScript, Vite, Refine, React Router 7, Ant Design
+- **Frontend**: React 19, TypeScript, Vite, Refine, React Router 7, shadcn/ui, Tailwind CSS
 - **OpenAPI types**: generated `frontend/openapi.json` and type/schema artifacts only
 - **Tooling**: `uv`, ruff, mypy, pytest, npm, Docker Compose
 

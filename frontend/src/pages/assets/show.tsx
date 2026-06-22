@@ -1,63 +1,67 @@
-import React from "react";
-import { DownloadOutlined } from "@ant-design/icons";
-import { Show, TextField } from "@refinedev/antd";
-import { App as AntdApp, Button, Space, Typography } from "antd";
-import { useShow } from "@refinedev/core";
+import { useOne, useParsed } from "@refinedev/core";
+import { toast } from "sonner";
+
 import type { AssetPresignedDownloadResponse, AssetPublic } from "@/client";
+import { DownloadButton } from "@/components/refine-ui/resource/record-actions";
+import {
+  Field,
+  LoadingFields,
+  ResourceCard,
+  ResourcePage,
+} from "@/components/refine-ui/resource/resource-page";
 import { apiClient } from "@/providers/data";
 import { formatBytes, formatDateTime } from "@/pages/assets/utils";
 
-const { Title } = Typography;
-
 export const AssetShow = () => {
-  const { message } = AntdApp.useApp();
+  const { id } = useParsed<{ id: string }>();
   const {
-    result: record,
+    result: asset,
     query: { isLoading },
-  } = useShow<AssetPublic>();
+  } = useOne<AssetPublic>({
+    resource: "assets",
+    id,
+    queryOptions: { enabled: Boolean(id) },
+  });
 
-  const handleDownload = React.useCallback(async () => {
-    if (!record?.id) return;
+  const handleDownload = async () => {
+    if (!asset?.id) return;
 
     try {
       const { data } =
         await apiClient.get<AssetPresignedDownloadResponse>(
-          `/assets/${record.id}/download-url`,
+          `/assets/${asset.id}/download-url`,
         );
       window.open(data.download_url, "_blank", "noopener,noreferrer");
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to create download URL";
-      message.error(errorMessage);
+      toast.error(errorMessage);
     }
-  }, [message, record?.id]);
+  };
 
   return (
-    <Show
-      isLoading={isLoading}
-      headerButtons={({ defaultButtons }) => (
-        <Space>
-          {defaultButtons}
-          <Button icon={<DownloadOutlined />} onClick={handleDownload}>
-            Download
-          </Button>
-        </Space>
-      )}
+    <ResourcePage
+      title="Asset details"
+      actions={<DownloadButton onClick={handleDownload} />}
     >
-      <Title level={5}>File</Title>
-      <TextField value={record?.file_name} />
-      <Title level={5}>Content Type</Title>
-      <TextField value={record?.content_type} />
-      <Title level={5}>Size</Title>
-      <TextField value={record ? formatBytes(record.size) : undefined} />
-      <Title level={5}>Created</Title>
-      <TextField value={formatDateTime(record?.created_at)} />
-      <Title level={5}>Object Key</Title>
-      <TextField value={record?.object_key} />
-      <Title level={5}>Owner Id</Title>
-      <TextField value={record?.owner_id} />
-      <Title level={5}>Id</Title>
-      <TextField value={record?.id} />
-    </Show>
+      <ResourceCard title={asset?.file_name ?? "Asset"}>
+        {isLoading ? (
+          <LoadingFields count={7} />
+        ) : (
+          <dl className="grid gap-5 sm:grid-cols-2">
+            <Field label="File" value={asset?.file_name} />
+            <Field label="Content type" value={asset?.content_type} />
+            <Field
+              label="Size"
+              value={asset ? formatBytes(asset.size) : undefined}
+            />
+            <Field label="Created" value={formatDateTime(asset?.created_at)} />
+            <Field label="Object key" value={asset?.object_key} />
+            <Field label="Owner Id" value={asset?.owner_id} />
+            <Field label="Id" value={asset?.id} />
+          </dl>
+        )}
+      </ResourceCard>
+    </ResourcePage>
   );
 };

@@ -38,7 +38,7 @@ export const authProvider: AuthProvider = {
           message: getApiErrorMessage(errorData, "Invalid email or password"),
         },
       };
-    } catch (error) {
+    } catch {
       return {
         success: false,
         error: {
@@ -82,7 +82,7 @@ export const authProvider: AuthProvider = {
           message: getApiErrorMessage(errorData, "Registration failed"),
         },
       };
-    } catch (error) {
+    } catch {
       return {
         success: false,
         error: {
@@ -117,7 +117,7 @@ export const authProvider: AuthProvider = {
           message: getApiErrorMessage(errorData, "Failed to send recovery email"),
         },
       };
-    } catch (error) {
+    } catch {
       return {
         success: false,
         error: {
@@ -160,7 +160,7 @@ export const authProvider: AuthProvider = {
           message: getApiErrorMessage(errorData, "Failed to update password"),
         },
       };
-    } catch (error) {
+    } catch {
       return {
         success: false,
         error: {
@@ -206,7 +206,7 @@ export const authProvider: AuthProvider = {
         authenticated: false,
         redirectTo: "/login",
       };
-    } catch (error) {
+    } catch {
       return {
         authenticated: false,
         redirectTo: "/login",
@@ -229,7 +229,7 @@ export const authProvider: AuthProvider = {
         const user = await response.json();
         return user.is_superuser ? ["admin"] : ["user"];
       }
-    } catch (error) {
+    } catch {
       // ignore
     }
     return null;
@@ -255,7 +255,7 @@ export const authProvider: AuthProvider = {
           avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name || user.email)}&background=random`,
         };
       }
-    } catch (error) {
+    } catch {
       // ignore
     }
     return null;

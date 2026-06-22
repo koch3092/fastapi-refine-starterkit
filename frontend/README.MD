@@ -3,7 +3,7 @@
 ## Getting Started
 
 This is the Refine admin console for the FastAPI starterkit. It uses React,
-TypeScript, Vite, Ant Design, and `@refinedev/simple-rest`.
+TypeScript, Vite, shadcn/ui, Tailwind CSS, and `@refinedev/simple-rest`.
 
 ## Available Scripts
 
@@ -42,7 +42,7 @@ and `src/client/types.gen.ts`.
 To learn more about **Refine**, please check out the [Documentation](https://refine.dev/docs)
 
 - **REST Data Provider** [Docs](https://refine.dev/docs/core/providers/data-provider/#overview)
-- **Ant Design** [Docs](https://refine.dev/docs/ui-frameworks/antd/tutorial/)
+- **Refine shadcn/ui** [Docs](https://refine.dev/docs/ui-integrations/shadcn-ui/)
 - **React Router** [Docs](https://refine.dev/docs/core/providers/router-provider/)
 - **Custom Auth Provider** [Docs](https://refine.dev/docs/core/providers/auth-provider/)
 

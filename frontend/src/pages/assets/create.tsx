@@ -1,38 +1,38 @@
-import React from "react";
-import { UploadOutlined } from "@ant-design/icons";
 import { useNavigation } from "@refinedev/core";
-import { Create } from "@refinedev/antd";
-import { App as AntdApp, Form, Input, Upload } from "antd";
-import type { UploadFile } from "antd/es/upload/interface";
+import type { FormEvent } from "react";
+import * as React from "react";
+import { toast } from "sonner";
+
 import type {
   AssetPresignedUploadRequest,
   AssetPresignedUploadResponse,
 } from "@/client";
+import {
+  FormActions,
+  FormGrid,
+  ResourceCard,
+  ResourcePage,
+} from "@/components/refine-ui/resource/resource-page";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { apiClient } from "@/providers/data";
 
-const { Dragger } = Upload;
-
-type AssetUploadFormValues = {
-  file_name?: string;
-};
-
 export const AssetCreate = () => {
-  const [form] = Form.useForm<AssetUploadFormValues>();
-  const { message } = AntdApp.useApp();
   const { list } = useNavigation();
-  const [fileList, setFileList] = React.useState<UploadFile[]>([]);
+  const [file, setFile] = React.useState<File | null>(null);
+  const [fileName, setFileName] = React.useState("");
   const [isUploading, setIsUploading] = React.useState(false);
 
-  const handleSubmit = React.useCallback(async () => {
-    const file = fileList[0]?.originFileObj;
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     if (!file) {
-      message.error("Select a file first");
+      toast.error("Select a file first");
       return;
     }
 
-    const values = await form.validateFields();
     const payload: AssetPresignedUploadRequest = {
-      file_name: values.file_name?.trim() || file.name,
+      file_name: fileName.trim() || file.name,
       content_type: file.type || "application/octet-stream",
       size: file.size,
     };
@@ -54,54 +54,60 @@ export const AssetCreate = () => {
         throw new Error(`Upload failed with status ${uploadResponse.status}`);
       }
 
-      message.success("Asset uploaded");
+      toast.success("Asset uploaded");
       list("assets");
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Asset upload failed";
-      message.error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsUploading(false);
     }
-  }, [fileList, form, list, message]);
+  };
 
   return (
-    <Create saveButtonProps={{ loading: isUploading, onClick: handleSubmit }}>
-      <Form form={form} layout="vertical">
-        <Form.Item label="File" required>
-          <Dragger
-            beforeUpload={() => false}
-            fileList={fileList}
-            maxCount={1}
-            multiple={false}
-            onChange={({ fileList: nextFileList }) => {
-              const nextFile = nextFileList.slice(-1);
-              setFileList(nextFile);
-
-              const selectedName = nextFile[0]?.name;
-              if (selectedName && !form.getFieldValue("file_name")) {
-                form.setFieldValue("file_name", selectedName);
-              }
-            }}
-            onRemove={() => {
-              setFileList([]);
-              return true;
-            }}
-          >
-            <p className="ant-upload-drag-icon">
-              <UploadOutlined />
-            </p>
-            <p className="ant-upload-text">Select or drop a file</p>
-          </Dragger>
-        </Form.Item>
-        <Form.Item
-          label="File Name"
-          name="file_name"
-          rules={[{ required: true, message: "File name is required" }]}
-        >
-          <Input maxLength={255} />
-        </Form.Item>
-      </Form>
-    </Create>
+    <ResourcePage title="Upload asset">
+      <ResourceCard title="Asset file">
+        <form onSubmit={handleSubmit}>
+          <FormGrid>
+            <div className="grid gap-2">
+              <Label htmlFor="file">File</Label>
+              <Input
+                id="file"
+                type="file"
+                required
+                onChange={(event) => {
+                  const nextFile = event.target.files?.[0] ?? null;
+                  setFile(nextFile);
+                  if (nextFile && !fileName) {
+                    setFileName(nextFile.name);
+                  }
+                }}
+              />
+              {file && (
+                <p className="text-sm text-muted-foreground">
+                  {file.name} · {file.type || "application/octet-stream"}
+                </p>
+              )}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="file_name">File name</Label>
+              <Input
+                id="file_name"
+                required
+                maxLength={255}
+                value={fileName}
+                onChange={(event) => setFileName(event.target.value)}
+              />
+            </div>
+            <FormActions
+              submitLabel="Upload asset"
+              isSubmitting={isUploading}
+              onCancel={() => list("assets")}
+            />
+          </FormGrid>
+        </form>
+      </ResourceCard>
+    </ResourcePage>
   );
 };
