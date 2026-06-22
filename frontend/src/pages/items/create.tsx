@@ -2,6 +2,7 @@ import React from "react";
 import { usePermissions } from "@refinedev/core";
 import { Create, useForm, useSelect } from "@refinedev/antd";
 import { Form, Input, Select } from "antd";
+import type { Owner } from "@/pages/items/types";
 
 export const ItemCreate = () => {
   const { data: permissions } = usePermissions({});
@@ -9,7 +10,7 @@ export const ItemCreate = () => {
     Array.isArray(permissions) && permissions.includes("admin");
   const { formProps, saveButtonProps } = useForm();
 
-  const { selectProps: ownerSelectProps } = useSelect({
+  const { selectProps: ownerSelectProps } = useSelect<Owner>({
     resource: "owners",
     optionLabel: (owner) => owner.full_name ?? owner.email,
     searchField: "email",

@@ -2,7 +2,7 @@ import uuid
 from typing import Any
 
 from sqlalchemy import ColumnElement
-from sqlmodel import Session, func, select
+from sqlmodel import Session, col, func, select
 
 from app.models import Item, ItemCreate, ItemUpdate
 
@@ -50,7 +50,7 @@ def get_items_paginated(
     # Build base query conditions
     base_conditions: list[ColumnElement[Any]] = []
     if owner_id is not None:
-        base_conditions.append(Item.owner_id == owner_id)
+        base_conditions.append(col(Item.owner_id) == owner_id)
     if conditions:
         base_conditions.extend(conditions)
 

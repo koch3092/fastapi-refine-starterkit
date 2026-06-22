@@ -86,7 +86,7 @@ requires-dist = [
     { name = "email-validator", specifier = ">=2.1.0.post1,<3.0.0.0" },
     { name = "emails", specifier = ">=0.6,<1.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.114.2,<1.0.0" },
-    { name = "fastapi-refine", specifier = ">=0.1.0" },
+    { name = "fastapi-refine", specifier = "==0.4.1" },
     { name = "httpx", specifier = ">=0.25.1,<1.0.0" },
     { name = "jinja2", specifier = ">=3.1.4,<4.0.0" },
     { name = "passlib", extras = ["bcrypt"], specifier = ">=1.7.4,<2.0.0" },
@@ -442,15 +442,15 @@ standard = [
 
 [[package]]
 name = "fastapi-refine"
-version = "0.1.0"
+version = "0.4.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fastapi" },
     { name = "sqlmodel" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1a/de/3cdbd525484964f9d16deacaf1f5407a035aa3622d12492d0c9844026836/fastapi_refine-0.1.0.tar.gz", hash = "sha256:ec1985d26f20ee1ee074ad0fac6a7aae58ec69394513c1e3a6d60966134897da", size = 16758, upload-time = "2026-01-08T05:37:16.423Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1e/10/056d6015b573403c8be8053aececd4c624f1e3b9fbbef3b92daeb0ae29bb/fastapi_refine-0.4.1.tar.gz", hash = "sha256:e07f02b37aeac50aceda609e0571a781750aa7b18c197f312010af3f90f96585", size = 32896, upload-time = "2026-05-19T11:59:43.953Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/03/ba/07f42bcc2f8e962454deda72e8077b08e78fadd5ab1554a3c822bc0420bc/fastapi_refine-0.1.0-py3-none-any.whl", hash = "sha256:72bc0197639cb79d223a5f1f75b6dcc00d4f1f3d1c74c0ccc692e81b470c5d3c", size = 16258, upload-time = "2026-01-08T05:37:15.332Z" },
+    { url = "https://files.pythonhosted.org/packages/86/2f/3dedf94da6fc559f36ebc6c4eca7f12a8f320d1fe0bfc5dbcf05fd3d61d3/fastapi_refine-0.4.1-py3-none-any.whl", hash = "sha256:ecc4c8f24eecf2e92c77b24ea34fcd90424bd3f554db90123b812905f3812360", size = 24104, upload-time = "2026-05-19T11:59:42.362Z" },
 ]
 
 [[package]]

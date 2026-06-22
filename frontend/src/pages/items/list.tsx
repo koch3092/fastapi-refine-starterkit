@@ -14,6 +14,7 @@ import {
   DeleteButton,
 } from "@refinedev/antd";
 import { Table, Space } from "antd";
+import type { Owner } from "@/pages/items/types";
 
 export const ItemList = () => {
   const { data: permissions } = usePermissions({});
@@ -37,7 +38,7 @@ export const ItemList = () => {
   const {
     result: ownerData,
     query: { isLoading: ownerIsLoading },
-  } = useMany({
+  } = useMany<Owner>({
     resource: "owners",
     ids: ownerIds,
     queryOptions: {
@@ -62,7 +63,6 @@ export const ItemList = () => {
             if (!isAdmin) return me?.name ?? me?.email ?? "You";
             if (ownerIsLoading) return <>Loading...</>;
             const owner = ownersById.get(value);
-            console.log("owner: ", owner);
             return owner?.full_name ?? owner?.email ?? value ?? "-";
           }}
         />

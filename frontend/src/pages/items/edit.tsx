@@ -2,6 +2,7 @@ import React from "react";
 import { usePermissions } from "@refinedev/core";
 import { Edit, useForm, useSelect } from "@refinedev/antd";
 import { Form, Input, Select } from "antd";
+import type { Owner } from "@/pages/items/types";
 
 export const ItemEdit = () => {
   const { data: permissions } = usePermissions({});
@@ -11,7 +12,7 @@ export const ItemEdit = () => {
 
   const itemsData = query?.data?.data;
 
-  const { selectProps: ownerSelectProps } = useSelect({
+  const { selectProps: ownerSelectProps } = useSelect<Owner>({
     resource: "owners",
     defaultValue: itemsData?.owner_id,
     optionLabel: (owner) => owner.full_name ?? owner.email,

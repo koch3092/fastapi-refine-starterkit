@@ -12,7 +12,7 @@
     "@refinedev/inferencer": "^6.0.2",
     "@refinedev/kbar": "^2.0.0",
     "@refinedev/react-router": "^2.0.0",
-    "@refinedev/rest": "^2.1.0",
+    "@refinedev/simple-rest": "^6.0.0",
     "@uiw/react-md-editor": "^4.0.8",
     "antd": "^5.23.0",
     "react": "^19.1.0",
@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@hey-api/openapi-ts": "0.73.0",
     "@types/node": "^20",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
@@ -40,7 +41,8 @@
     "dev": "refine dev",
     "build": "tsc && refine build",
     "start": "refine start",
-    "refine": "refine"
+    "refine": "refine",
+    "generate-client": "openapi-ts"
   },
   "browserslist": {
     "production": [

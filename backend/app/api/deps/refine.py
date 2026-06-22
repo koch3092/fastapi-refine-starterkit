@@ -1,11 +1,14 @@
+from typing import cast
+
 from fastapi import Depends
+from fastapi.params import Depends as DependsParam
 from fastapi_refine import FilterConfig, PaginationConfig, SortConfig, refine_query
 from sqlmodel import SQLModel
 
 DEFAULT_PAGINATION_CONFIG = PaginationConfig(
-    default_skip=0,
-    default_limit=10,
-    max_limit=100,
+    default_start=0,
+    default_page_size=10,
+    max_page_size=100,
 )
 
 
@@ -14,7 +17,7 @@ def refine_query_dep(
     filter_config: FilterConfig,
     sort_config: SortConfig,
     pagination_config: PaginationConfig | None = None,
-) -> Depends:
+) -> DependsParam:
     """Build a dependency for Refine query parsing.
 
     Args:
@@ -28,4 +31,7 @@ def refine_query_dep(
     """
     if pagination_config is None:
         pagination_config = DEFAULT_PAGINATION_CONFIG
-    return Depends(refine_query(model, filter_config, sort_config, pagination_config))
+    return cast(
+        DependsParam,
+        Depends(refine_query(model, filter_config, sort_config, pagination_config)),
+    )

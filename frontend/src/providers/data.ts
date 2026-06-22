@@ -1,18 +1,15 @@
-import { createSimpleRestDataProvider } from "@refinedev/rest/simple-rest";
+import dataProviderFactory, { axiosInstance } from "@refinedev/simple-rest";
 import { API_URL, TOKEN_KEY } from "@/providers/constants";
 
-export const { dataProvider, kyInstance } = createSimpleRestDataProvider({
-  apiURL: API_URL,
-  kyOptions: {
-    hooks: {
-      beforeRequest: [
-        (request) => {
-          const token = localStorage.getItem(TOKEN_KEY);
-          if (token) {
-            request.headers.set("Authorization", `Bearer ${token}`);
-          }
-        },
-      ],
-    },
-  },
+axiosInstance.defaults.baseURL = API_URL;
+
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token) {
+    config.headers.set("Authorization", `Bearer ${token}`);
+  }
+  return config;
 });
+
+export const apiClient = axiosInstance;
+export const dataProvider = dataProviderFactory(API_URL, axiosInstance);

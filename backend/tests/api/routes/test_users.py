@@ -110,7 +110,10 @@ def test_get_existing_user_permissions_error(
         headers=normal_user_token_headers,
     )
     assert r.status_code == 403
-    assert r.json() == {"detail": "The user doesn't have enough privileges"}
+    assert r.json() == {
+        "message": "The user doesn't have enough privileges",
+        "statusCode": 403,
+    }
 
 
 def test_create_user_existing_username(
@@ -244,7 +247,8 @@ def test_update_password_me_incorrect_password(
     )
     assert r.status_code == 400
     updated_user = r.json()
-    assert updated_user["detail"] == "Incorrect password"
+    assert updated_user["message"] == "Incorrect password"
+    assert updated_user["statusCode"] == 400
 
 
 def test_update_user_me_email_exists(
@@ -262,7 +266,8 @@ def test_update_user_me_email_exists(
         json=data,
     )
     assert r.status_code == 409
-    assert r.json()["detail"] == "User with this email already exists"
+    assert r.json()["message"] == "User with this email already exists"
+    assert r.json()["statusCode"] == 409
 
 
 def test_update_password_me_same_password_error(
@@ -280,8 +285,9 @@ def test_update_password_me_same_password_error(
     assert r.status_code == 400
     updated_user = r.json()
     assert (
-        updated_user["detail"] == "New password cannot be the same as the current one"
+        updated_user["message"] == "New password cannot be the same as the current one"
     )
+    assert updated_user["statusCode"] == 400
 
 
 def test_register_user(client: TestClient, db: Session) -> None:
@@ -319,7 +325,10 @@ def test_register_user_already_exists_error(client: TestClient) -> None:
         json=data,
     )
     assert r.status_code == 400
-    assert r.json()["detail"] == "The user with this email already exists in the system"
+    assert (
+        r.json()["message"] == "The user with this email already exists in the system"
+    )
+    assert r.json()["statusCode"] == 400
 
 
 def test_update_user(
@@ -358,7 +367,8 @@ def test_update_user_not_exists(
         json=data,
     )
     assert r.status_code == 404
-    assert r.json()["detail"] == "The user with this id does not exist in the system"
+    assert r.json()["message"] == "The user with this id does not exist in the system"
+    assert r.json()["statusCode"] == 404
 
 
 def test_update_user_email_exists(
@@ -381,7 +391,8 @@ def test_update_user_email_exists(
         json=data,
     )
     assert r.status_code == 409
-    assert r.json()["detail"] == "User with this email already exists"
+    assert r.json()["message"] == "User with this email already exists"
+    assert r.json()["statusCode"] == 409
 
 
 def test_delete_user_me(client: TestClient, db: Session) -> None:
@@ -424,7 +435,8 @@ def test_delete_user_me_as_superuser(
     )
     assert r.status_code == 403
     response = r.json()
-    assert response["detail"] == "Super users are not allowed to delete themselves"
+    assert response["message"] == "Super users are not allowed to delete themselves"
+    assert response["statusCode"] == 403
 
 
 def test_delete_user_super_user(
@@ -454,7 +466,8 @@ def test_delete_user_not_found(
         headers=superuser_token_headers,
     )
     assert r.status_code == 404
-    assert r.json()["detail"] == "User not found"
+    assert r.json()["message"] == "User not found"
+    assert r.json()["statusCode"] == 404
 
 
 def test_delete_user_current_super_user_error(
@@ -471,7 +484,8 @@ def test_delete_user_current_super_user_error(
         headers=superuser_token_headers,
     )
     assert r.status_code == 403
-    assert r.json()["detail"] == "Super users are not allowed to delete themselves"
+    assert r.json()["message"] == "Super users are not allowed to delete themselves"
+    assert r.json()["statusCode"] == 403
 
 
 def test_delete_user_without_privileges(
@@ -487,4 +501,5 @@ def test_delete_user_without_privileges(
         headers=normal_user_token_headers,
     )
     assert r.status_code == 403
-    assert r.json()["detail"] == "The user doesn't have enough privileges"
+    assert r.json()["message"] == "The user doesn't have enough privileges"
+    assert r.json()["statusCode"] == 403

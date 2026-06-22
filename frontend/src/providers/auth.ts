@@ -1,6 +1,11 @@
 import type { AuthProvider } from "@refinedev/core";
 import { API_URL, TOKEN_KEY } from "@/providers/constants";
 
+const getApiErrorMessage = (
+  errorData: { message?: string; detail?: string },
+  fallback: string,
+) => errorData.message || errorData.detail || fallback;
+
 export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {
     try {
@@ -30,7 +35,7 @@ export const authProvider: AuthProvider = {
         success: false,
         error: {
           name: "LoginError",
-          message: errorData.detail || "Invalid email or password",
+          message: getApiErrorMessage(errorData, "Invalid email or password"),
         },
       };
     } catch (error) {
@@ -74,7 +79,7 @@ export const authProvider: AuthProvider = {
         success: false,
         error: {
           name: "RegisterError",
-          message: errorData.detail || "Registration failed",
+          message: getApiErrorMessage(errorData, "Registration failed"),
         },
       };
     } catch (error) {
@@ -109,7 +114,7 @@ export const authProvider: AuthProvider = {
         success: false,
         error: {
           name: "ForgotPasswordError",
-          message: errorData.detail || "Failed to send recovery email",
+          message: getApiErrorMessage(errorData, "Failed to send recovery email"),
         },
       };
     } catch (error) {
@@ -152,7 +157,7 @@ export const authProvider: AuthProvider = {
         success: false,
         error: {
           name: "UpdatePasswordError",
-          message: errorData.detail || "Failed to update password",
+          message: getApiErrorMessage(errorData, "Failed to update password"),
         },
       };
     } catch (error) {

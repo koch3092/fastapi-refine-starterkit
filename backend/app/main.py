@@ -1,6 +1,7 @@
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
+from fastapi_refine import configure_refine
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
@@ -8,7 +9,17 @@ from app.core.config import settings
 
 
 def custom_generate_unique_id(route: APIRoute) -> str:
-    return f"{route.tags[0]}-{route.name}"
+    """Build a stable OpenAPI operation id that stays unique across aliases."""
+    tag = route.tags[0] if route.tags else "default"
+    method = next(iter(sorted(route.methods or []))).lower()
+    path = (
+        route.path_format.strip("/")
+        .replace("/", "_")
+        .replace("-", "_")
+        .replace("{", "")
+        .replace("}", "")
+    )
+    return f"{tag}_{route.name}_{method}_{path}"
 
 
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
@@ -28,7 +39,8 @@ if settings.all_cors_origins:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
-        expose_headers=["X-Total-Count"],
+        expose_headers=["x-total-count"],
     )
 
+configure_refine(app)
 app.include_router(api_router, prefix=settings.API_V1_STR)
