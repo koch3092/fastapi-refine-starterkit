@@ -7,9 +7,8 @@ from app.services import user as user_service
 engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 
 
-# make sure all SQLModel models are imported (app.models) before initializing DB
-# otherwise, SQLModel might fail to initialize relationships properly
-# for more details: https://github.com/fastapi/full-stack-fastapi-template/issues/28
+# Make sure all SQLModel models are imported before initializing DB metadata.
+# Otherwise, SQLModel can miss relationships registered after engine setup.
 
 
 def init_db(session: Session) -> None:

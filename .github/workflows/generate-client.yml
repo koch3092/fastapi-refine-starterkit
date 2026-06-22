@@ -1,0 +1,48 @@
+name: Check OpenAPI Types
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  generate-client:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.4.15"
+          enable-cache: true
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+      - name: Install backend dependencies
+        run: uv sync
+        working-directory: backend
+      - name: Generate OpenAPI types
+        run: bash scripts/generate-client.sh
+        env:
+          PROJECT_NAME: FastAPI Refine Starterkit
+          SECRET_KEY: just-for-generating-openapi
+          POSTGRES_SERVER: localhost
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: just-for-generating-openapi
+          POSTGRES_DB: app
+          FIRST_SUPERUSER: admin@example.com
+          FIRST_SUPERUSER_PASSWORD: just-for-generating-openapi
+      - name: Check generated artifacts
+        run: git diff --exit-code frontend/openapi.json frontend/src/client

@@ -1,7 +1,5 @@
 from unittest.mock import MagicMock, patch
 
-from sqlmodel import select
-
 from app.backend_pre_start import init, logger
 
 
@@ -13,11 +11,12 @@ def test_init_successful_connection() -> None:
     session_mock.configure_mock(**{"exec.return_value": exec_mock})
 
     with (
-        patch("sqlmodel.Session", return_value=session_mock),
+        patch("app.backend_pre_start.Session") as session_cls_mock,
         patch.object(logger, "info"),
         patch.object(logger, "error"),
         patch.object(logger, "warn"),
     ):
+        session_cls_mock.return_value.__enter__.return_value = session_mock
         try:
             init(engine_mock)
             connection_successful = True
@@ -28,6 +27,4 @@ def test_init_successful_connection() -> None:
             connection_successful
         ), "The database connection should be successful and not raise an exception."
 
-        assert session_mock.exec.called_once_with(
-            select(1)
-        ), "The session should execute a select statement once."
+        session_mock.exec.assert_called_once()

@@ -1,19 +1,9 @@
-# frontend
-
-<div align="center" style="margin: 30px;">
-    <a href="https://refine.dev">
-    <img alt="refine logo" src="https://refine.ams3.cdn.digitaloceanspaces.com/readme/refine-readme-banner.png">
-    </a>
-</div>
-<br/>
-
-This [Refine](https://github.com/refinedev/refine) project was generated with [create refine-app](https://github.com/refinedev/refine/tree/master/packages/create-refine-app).
+# Frontend
 
 ## Getting Started
 
-A React Framework for building internal tools, admin panels, dashboards & B2B apps with unmatched flexibility ✨
-
-Refine's hooks and components simplifies the development process and eliminates the repetitive tasks by providing industry-standard solutions for crucial aspects of a project, including authentication, access control, routing, networking, state management, and i18n.
+This is the Refine admin console for the FastAPI starterkit. It uses React,
+TypeScript, Vite, Ant Design, and `@refinedev/simple-rest`.
 
 ## Available Scripts
 
@@ -36,6 +26,18 @@ Refine's hooks and components simplifies the development process and eliminates 
 ```
 
 ## Learn More
+
+This project uses `@refinedev/simple-rest` as the global data provider. Set
+`VITE_API_URL` to the backend origin, for example `http://localhost:8000`; the app
+adds `/api/v1` in `src/providers/constants.ts`.
+
+The default `assets` resource provides list/show/delete pages and a presigned upload
+flow. The frontend asks the backend for `/assets/presigned-upload`, then uploads the
+selected file directly to S3/MinIO with the returned URL and headers.
+
+OpenAPI generation is type-only. `bash ../scripts/generate-client.sh` writes
+`openapi.json` and generates only `src/client/index.ts`, `src/client/schemas.gen.ts`,
+and `src/client/types.gen.ts`.
 
 To learn more about **Refine**, please check out the [Documentation](https://refine.dev/docs)
 
