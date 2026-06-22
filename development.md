@@ -1,4 +1,4 @@
-# FastAPI Project - Development
+# FastAPI Refine Starterkit - Development
 
 ## Docker Compose
 
@@ -18,7 +18,9 @@ Automatic interactive documentation with Swagger UI (from the OpenAPI backend): 
 
 Adminer, database web administration: <http://localhost:8080>
 
-Traefik UI, to see how the routes are being handled by the proxy: <http://localhost:8090>
+MinIO API, S3-compatible object storage: <http://localhost:9000>
+
+MinIO Console, object storage administration: <http://localhost:9001>
 
 **Note**: The first time you start your stack, it might take a minute for it to be ready. While the backend waits for the database to be ready and configures everything. You can check the logs to monitor it.
 
@@ -171,6 +173,8 @@ Automatic Alternative Docs (ReDoc): <http://localhost:8000/redoc>
 
 Adminer: <http://localhost:8080>
 
-Traefik UI: <http://localhost:8090>
+MinIO API: <http://localhost:9000>
+
+MinIO Console: <http://localhost:9001>
 
 MailCatcher: <http://localhost:1080>
