@@ -94,6 +94,16 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER: EmailStr
     FIRST_SUPERUSER_PASSWORD: str
 
+    S3_INTERNAL_ENDPOINT_URL: str = "http://localhost:9000"
+    S3_PUBLIC_ENDPOINT_URL: str = "http://localhost:9000"
+    S3_ACCESS_KEY: str = "minioadmin"
+    S3_SECRET_KEY: str = "minioadmin"
+    S3_REGION: str = "us-east-1"
+    S3_BUCKET: str = "app-assets"
+    S3_ADDRESSING_STYLE: Literal["auto", "virtual", "path"] = "path"
+    S3_PRESIGNED_UPLOAD_EXPIRES_SECONDS: int = 900
+    S3_PRESIGNED_DOWNLOAD_EXPIRES_SECONDS: int = 900
+
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "changethis":
             message = (

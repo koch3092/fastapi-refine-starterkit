@@ -25,6 +25,7 @@ import { Login } from "@/pages/login";
 import { Register } from "@/pages/register";
 import { authProvider } from "@/providers/auth";
 import { dataProvider } from "@/providers/data";
+import { AssetCreate, AssetList, AssetShow } from "@/pages/assets";
 import { ItemCreate, ItemEdit, ItemList, ItemShow } from "@/pages/items";
 import { UserCreate, UserEdit, UserList, UserShow } from "@/pages/users";
 
@@ -49,6 +50,15 @@ function App() {
                     create: "/items/create",
                     edit: "/items/edit/:id",
                     show: "/items/show/:id",
+                    meta: {
+                      canDelete: true,
+                    },
+                  },
+                  {
+                    name: "assets",
+                    list: "/assets",
+                    create: "/assets/create",
+                    show: "/assets/show/:id",
                     meta: {
                       canDelete: true,
                     },
@@ -96,6 +106,11 @@ function App() {
                       <Route path="create" element={<ItemCreate />} />
                       <Route path="edit/:id" element={<ItemEdit />} />
                       <Route path="show/:id" element={<ItemShow />} />
+                    </Route>
+                    <Route path="/assets">
+                      <Route index element={<AssetList />} />
+                      <Route path="create" element={<AssetCreate />} />
+                      <Route path="show/:id" element={<AssetShow />} />
                     </Route>
                     {isAdmin && (
                       <Route path="/users">

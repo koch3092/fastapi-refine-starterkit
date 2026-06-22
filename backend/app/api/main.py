@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi_refine import refine_error_responses
 
-from app.api.routes import items, login, private, users, utils
+from app.api.routes import assets, items, login, private, users, utils
 from app.core.config import settings
 
 api_router = APIRouter(
@@ -14,6 +14,7 @@ api_router.include_router(users.router)
 api_router.include_router(users.owners_router)
 api_router.include_router(utils.router)
 api_router.include_router(items.router)
+api_router.include_router(assets.router)
 
 
 if settings.ENVIRONMENT == "local":
