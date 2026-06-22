@@ -27,7 +27,13 @@ $ source .venv/bin/activate
 
 Make sure your editor is using the correct Python virtual environment, with the interpreter at `backend/.venv/bin/python`.
 
-Modify or add SQLModel models for data and SQL tables in `./backend/app/models.py`, API endpoints in `./backend/app/api/`, CRUD (Create, Read, Update, Delete) utils in `./backend/app/crud.py`.
+Modify or add SQLModel models for data and SQL tables in `./backend/app/models.py`, API endpoints in `./backend/app/api/`, and business/data access functions in `./backend/app/services/`.
+
+List endpoints consumed by Refine should use `fastapi-refine` query helpers in the API layer and return the `x-total-count` header. See [../docs/contracts/refine-simple-rest.md](../docs/contracts/refine-simple-rest.md) and [docs/contracts/refine-query-contract.md](docs/contracts/refine-query-contract.md).
+
+The default file resource is `assets`. It stores metadata in PostgreSQL and stores
+objects through S3-compatible storage. Local Docker uses MinIO, creates the configured
+bucket during startup, and applies bucket CORS for browser presigned uploads.
 
 ## VS Code
 
