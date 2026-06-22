@@ -1,51 +1,67 @@
-import React from "react";
-import { useGetIdentity, useOne, usePermissions, useShow } from "@refinedev/core";
-import { Show, TextField } from "@refinedev/antd";
-import { Typography } from "antd";
+import {
+  useGetIdentity,
+  useOne,
+  useParsed,
+  usePermissions,
+} from "@refinedev/core";
+
+import type { ItemPublic } from "@/client";
+import {
+  Field,
+  LoadingFields,
+  ResourceCard,
+  ResourcePage,
+} from "@/components/refine-ui/resource/resource-page";
 import type { Owner } from "@/pages/items/types";
 
-const { Title } = Typography;
-
 export const ItemShow = () => {
+  const { id } = useParsed<{ id: string }>();
   const { data: permissions } = usePermissions({});
   const isAdmin =
     Array.isArray(permissions) && permissions.includes("admin");
   const { data: me } = useGetIdentity<{ name?: string; email?: string }>();
 
   const {
-    result: record,
+    result: item,
     query: { isLoading },
-  } = useShow();
+  } = useOne<ItemPublic>({
+    resource: "items",
+    id,
+    queryOptions: { enabled: Boolean(id) },
+  });
 
   const {
-    result: ownerData,
+    result: owner,
     query: { isLoading: ownerIsLoading },
   } = useOne<Owner>({
     resource: "owners",
-    id: record?.owner_id || "",
+    id: item?.owner_id,
     queryOptions: {
-      enabled: isAdmin && !!record?.owner_id,
+      enabled: isAdmin && Boolean(item?.owner_id),
     },
   });
 
   const ownerLabel = isAdmin
-    ? ownerData?.full_name ?? ownerData?.email ?? record?.owner_id ?? "-"
+    ? owner?.full_name ?? owner?.email ?? item?.owner_id ?? "-"
     : me?.name ?? me?.email ?? "You";
 
   return (
-    <Show isLoading={isLoading}>
-      <Title level={5}>Title</Title>
-      <TextField value={record?.title} />
-      <Title level={5}>Description</Title>
-      <TextField value={record?.description} />
-      <Title level={5}>Id</Title>
-      <TextField value={record?.id} />
-      <Title level={5}>Owner</Title>
-      {isAdmin && ownerIsLoading ? (
-        <>Loading...</>
-      ) : (
-        <TextField value={ownerLabel} />
-      )}
-    </Show>
+    <ResourcePage title="Item details">
+      <ResourceCard title={item?.title ?? "Item"}>
+        {isLoading ? (
+          <LoadingFields count={4} />
+        ) : (
+          <dl className="grid gap-5 sm:grid-cols-2">
+            <Field label="Title" value={item?.title} />
+            <Field label="Description" value={item?.description} />
+            <Field label="Id" value={item?.id} />
+            <Field
+              label="Owner"
+              value={isAdmin && ownerIsLoading ? "Loading..." : ownerLabel}
+            />
+          </dl>
+        )}
+      </ResourceCard>
+    </ResourcePage>
   );
 };

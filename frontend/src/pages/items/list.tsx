@@ -1,19 +1,22 @@
-import React from "react";
+import { Link } from "react-router";
 import {
-  BaseKey,
-  BaseRecord,
   useGetIdentity,
   useMany,
   usePermissions,
-} from "@refinedev/core";
-import {
   useTable,
-  List,
-  EditButton,
-  ShowButton,
-  DeleteButton,
-} from "@refinedev/antd";
-import { Table, Space } from "antd";
+} from "@refinedev/core";
+import { Plus } from "lucide-react";
+import * as React from "react";
+
+import type { ItemPublic } from "@/client";
+import { RecordActions } from "@/components/refine-ui/resource/record-actions";
+import {
+  ResourceTable,
+  TablePagination,
+  type ResourceColumn,
+} from "@/components/refine-ui/resource/resource-table";
+import { ResourcePage } from "@/components/refine-ui/resource/resource-page";
+import { Button } from "@/components/ui/button";
 import type { Owner } from "@/pages/items/types";
 
 export const ItemList = () => {
@@ -22,18 +25,19 @@ export const ItemList = () => {
     Array.isArray(permissions) && permissions.includes("admin");
   const { data: me } = useGetIdentity<{ name?: string; email?: string }>();
 
-  const { tableProps } = useTable({
+  const table = useTable<ItemPublic>({
+    resource: "items",
     syncWithLocation: true,
   });
 
   const ownerIds = React.useMemo(() => {
     const ids =
-      tableProps?.dataSource
-        ?.map((item) => item?.owner_id)
-        .filter((id): id is BaseKey => Boolean(id)) ?? [];
+      table.result.data
+        ?.map((item) => item.owner_id)
+        .filter((id): id is string => Boolean(id)) ?? [];
 
     return Array.from(new Set(ids));
-  }, [tableProps?.dataSource]);
+  }, [table.result.data]);
 
   const {
     result: ownerData,
@@ -50,34 +54,62 @@ export const ItemList = () => {
     return new Map(ownerData?.data?.map((owner) => [owner.id, owner]) ?? []);
   }, [ownerData?.data]);
 
+  const columns: ResourceColumn<ItemPublic>[] = [
+    { key: "title", header: "Title", render: (item) => item.title },
+    {
+      key: "description",
+      header: "Description",
+      render: (item) => item.description ?? "-",
+    },
+    {
+      key: "owner",
+      header: "Owner",
+      render: (item) => {
+        if (!isAdmin) return me?.name ?? me?.email ?? "You";
+        if (ownerIsLoading) return "Loading...";
+        const owner = ownersById.get(item.owner_id);
+        return owner?.full_name ?? owner?.email ?? item.owner_id ?? "-";
+      },
+    },
+    { key: "id", header: "Id", render: (item) => item.id },
+    {
+      key: "actions",
+      header: <span className="sr-only">Actions</span>,
+      className: "w-36 text-right",
+      render: (item) => (
+        <RecordActions
+          resource="items"
+          id={item.id}
+          onDeleted={() => table.tableQuery.refetch()}
+        />
+      ),
+    },
+  ];
+
   return (
-    <List>
-      <Table {...tableProps} rowKey="id">
-        <Table.Column dataIndex="id" title="Id" />
-        <Table.Column dataIndex="title" title="Title" />
-        <Table.Column dataIndex="description" title="Description" />
-        <Table.Column
-          dataIndex={"owner_id"}
-          title="Owner"
-          render={(value) => {
-            if (!isAdmin) return me?.name ?? me?.email ?? "You";
-            if (ownerIsLoading) return <>Loading...</>;
-            const owner = ownersById.get(value);
-            return owner?.full_name ?? owner?.email ?? value ?? "-";
-          }}
-        />
-        <Table.Column
-          title="Actions"
-          dataIndex="actions"
-          render={(_, record: BaseRecord) => (
-            <Space>
-              <EditButton hideText size="small" recordItemId={record.id} />
-              <ShowButton hideText size="small" recordItemId={record.id} />
-              <DeleteButton hideText size="small" recordItemId={record.id} />
-            </Space>
-          )}
-        />
-      </Table>
-    </List>
+    <ResourcePage
+      title="Items"
+      description="Baseline CRUD resource for project-specific data models."
+      actions={
+        <Button asChild>
+          <Link to="/items/create">
+            <Plus className="size-4" />
+            New item
+          </Link>
+        </Button>
+      }
+    >
+      <ResourceTable
+        columns={columns}
+        data={table.result.data}
+        isLoading={table.tableQuery.isLoading}
+      />
+      <TablePagination
+        currentPage={table.currentPage}
+        pageCount={table.pageCount}
+        total={table.result.total}
+        onPageChange={table.setCurrentPage}
+      />
+    </ResourcePage>
   );
 };
