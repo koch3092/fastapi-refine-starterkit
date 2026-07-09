@@ -5,7 +5,7 @@
 - `app/api/` 为 HTTP 接口层，`app/api/routes/` 放置具体路由，`app/api/deps/` 放置依赖注入（`common.py` 与 `refine.py`）。
 - `app/services/` 为业务与 CRUD 处理层，聚合业务逻辑与数据操作。
 - `app/core/` 为共享配置与基础设施，如 `config.py`、`db.py`、`security.py`。
-- `app/models.py` 为数据模型定义；`app/utils.py` 为通用工具。
+- `app/models/` 为数据模型定义，按实体类别拆分；`app/utils.py` 为通用工具。
 - `app/backend_pre_start.py`、`app/tests_pre_start.py` 为启动前检查脚本；`app/initial_data.py` 初始化数据。
 - `app/alembic/` 保存迁移脚本；`alembic.ini` 为迁移配置。
 - `app/email-templates/` 为邮件模板，`src/` 为 MJML 源文件，`build/` 为生成的 HTML。
@@ -17,9 +17,9 @@
 - Service 层（`app/services/`）包含业务规则/权限校验/事务边界与 CRUD 数据访问，直接使用 SQLModel 访问数据库，对外暴露稳定接口。
 - 数据访问统一收口在 `app/services/`，避免散落到 API 或 `app/utils.py`。
 - Core 层（`app/core/`）提供配置、DB 会话、安全、外部客户端等基础设施。
-- 数据模型与 Schema 当前合并在 `app/models.py`；如后续拆分再引入 `app/schemas/`。
+- 数据模型与 Schema 当前按实体类别放在 `app/models/`；如后续需要可再引入 `app/schemas/`。
 
-- 依赖方向与边界：`app/api/` -> `app/services/`；`app/services/` 可依赖 `app/core/` 与 `app/models.py`；`app/core/` 不依赖上层业务代码；任何层不得绕过 `app/services/` 直接访问 DB。
+- 依赖方向与边界：`app/api/` -> `app/services/`；`app/services/` 可依赖 `app/core/` 与 `app/models/`；`app/core/` 不依赖上层业务代码；任何层不得绕过 `app/services/` 直接访问 DB。
 - 约束补充：数据访问不得散落到 `app/utils.py` 或脚本层。
 - HTTP 查询约束参见 `docs/contracts/refine-query-contract.md`。
 - Refine simple-rest 约定参见 `../docs/contracts/refine-simple-rest.md`。

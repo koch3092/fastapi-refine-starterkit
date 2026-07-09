@@ -68,7 +68,7 @@ frontend artifacts: `frontend/src/client/index.ts`, `schemas.gen.ts`, and
 
 ## Adding a Resource
 
-1. Add SQLModel models in `backend/app/models.py`.
+1. Add SQLModel models under `backend/app/models/`.
 2. Add service functions under `backend/app/services/`.
 3. Add routes under `backend/app/api/routes/` and include them in `backend/app/api/main.py`.
 4. For Refine list pages, define `FilterConfig` / `SortConfig` in the API layer and return `x-total-count`.
