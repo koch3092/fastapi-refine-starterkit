@@ -16,8 +16,6 @@ Backend, JSON based web API based on OpenAPI: <http://localhost:8000>
 
 Automatic interactive documentation with Swagger UI (from the OpenAPI backend): <http://localhost:8000/docs>
 
-Adminer, database web administration: <http://localhost:8080>
-
 MinIO API, S3-compatible object storage: <http://localhost:9000>
 
 MinIO Console, object storage administration: <http://localhost:9001>
@@ -170,8 +168,6 @@ Backend: <http://localhost:8000>
 Automatic Interactive Docs (Swagger UI): <http://localhost:8000/docs>
 
 Automatic Alternative Docs (ReDoc): <http://localhost:8000/redoc>
-
-Adminer: <http://localhost:8080>
 
 MinIO API: <http://localhost:9000>
 

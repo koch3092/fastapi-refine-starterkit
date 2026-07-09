@@ -1,8 +1,8 @@
 # FastAPI Refine Starterkit - Deployment
 
 This project can be deployed with Docker Compose to a remote server. The default
-stack contains Postgres, MinIO, the FastAPI backend, the Refine frontend, and
-Adminer. HTTPS termination and public routing are intentionally left to your own
+stack contains Postgres, MinIO, the FastAPI backend, and the Refine frontend.
+HTTPS termination and public routing are intentionally left to your own
 infrastructure, such as Nginx, Caddy, a cloud load balancer, or an existing
 platform gateway.
 
@@ -73,9 +73,6 @@ own reverse proxy or platform gateway on the same Docker network and route:
 * MinIO API host to `minio:9000`, if browser uploads should use bundled MinIO
 * MinIO console host to `minio:9001`, only when explicitly needed
 
-Adminer is included for operational convenience but should not be exposed
-publicly without strong access controls.
-
 If you want a direct-port deployment instead of a reverse proxy, add a
 production-specific compose override that publishes only the services you need.
 Use `docker-compose.override.yml` as a local-development reference, not as a
@@ -101,6 +98,5 @@ the useful URLs are:
 * Frontend: `http://localhost:5173`
 * Backend API docs: `http://localhost:8000/docs`
 * Backend API base URL: `http://localhost:8000`
-* Adminer: `http://localhost:8080`
 * MinIO API: `http://localhost:9000`
 * MinIO console: `http://localhost:9001`
