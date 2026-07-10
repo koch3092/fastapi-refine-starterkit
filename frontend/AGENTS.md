@@ -25,7 +25,7 @@
 - 如需新增测试，请在 `package.json` 添加脚本并使用 `*.test.tsx` 命名。
 
 ## 提交与 PR 规范
-- 遵循历史中的约定式提交前缀（`feat:`、`chore:`），保持简短祈使语气。
+- 提交信息遵循 Conventional Commits：`type: summary`（如 `feat`、`chore`），前端改动统一加 `[前端]`。
 - PR 需包含清晰描述、关联 issue（如有）、UI 改动截图。
 - 若涉及 `src/providers/` 或 `src/App.tsx` 的路由/资源改动，请注明 API 变更或迁移说明。
 
